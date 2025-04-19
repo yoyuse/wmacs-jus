@@ -20,8 +20,9 @@
 ; ----------------------------------------------------------------------------
 ;
 
-WmacsVersion := "2025-04-17"
+WmacsVersion := "2025-04-19"
 
+; 2025-04-19 wmacs-jus.ico
 ; 2025-04-17 fix remap Ins
 ; 2025-04-16 RemapRWinToRCtrl, UseHHK; remove TTT
 ; 2025-04-12 wmacs-jus.ahk from wim-jus-ahk2.ahk 2024-07-03
@@ -162,8 +163,8 @@ RemoveToolTip() {
 IniFile := A_Linefile "\..\wmacs-jus.ini"
 Section := "wmacs-jus"
 
-; wmacs.ico
-IconFile := A_Linefile "\..\wmacs.ico"
+; wmacs-jus.ico
+IconFile := A_Linefile "\..\wmacs-jus.ico"
 
 strWmacsVersion := "Wmacs JUS " WmacsVersion
 WmacsURL := "https://github.com/yoyuse/wmacs-jus"
