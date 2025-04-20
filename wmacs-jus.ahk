@@ -20,9 +20,11 @@
 ; ----------------------------------------------------------------------------
 ;
 
+#Requires AutoHotkey v2.0
+
 WmacsVersion := "2025-04-20"
 
-; 2025-04-20 WmacsBind
+; 2025-04-20 WmacsBind; comment out: OnClipboardChange ClipChanged
 ; 2025-04-20 RemapRWinToRCtrl → RWinToRCtrl; !Use104On104 → JUSLayout
 ; 2025-04-20 AltOneShotToMuHenkan; !UseHHK → HankakuZenkakuToEsc
 ; 2025-04-19 wmacs-jus.ico
@@ -133,6 +135,7 @@ isTargetExplorer() {
 ; OnClipboardChange
 ; --------------------------------------------------------------------
 
+/*
 OnClipboardChange ClipChanged
 
 ClipChanged(Type) {
@@ -157,6 +160,7 @@ ClipChanged(Type) {
 RemoveToolTip() {
     ToolTip
 }
+*/
 
 ; --------------------------------------------------------------------
 ; Tray Icon / Menu
