@@ -20,8 +20,11 @@
 ; ----------------------------------------------------------------------------
 ;
 
-WmacsVersion := "2025-04-19"
+WmacsVersion := "2025-04-20"
 
+; 2025-04-20 WmacsBind
+; 2025-04-20 RemapRWinToRCtrl → RWinToRCtrl; !Use104On104 → JUSLayout
+; 2025-04-20 AltOneShotToMuHenkan; !UseHHK → HankakuZenkakuToEsc
 ; 2025-04-19 wmacs-jus.ico
 ; 2025-04-17 fix remap Ins
 ; 2025-04-16 RemapRWinToRCtrl, UseHHK; remove TTT
@@ -65,7 +68,7 @@ quoted_insert() {
 }
 
 SendBlind(key) {
-    global RemapRWinToRCtrl
+    global RWinToRCtrl
     modif := ""
     if GetKeyState("RCtrl") {
         modif := modif "^"
@@ -73,12 +76,12 @@ SendBlind(key) {
     if GetKeyState("Shift", "P") {
         modif := modif "+"
     }
-    ; if GetKeyState(RemapRWinToRCtrl ? "LAlt" : "Alt", "P") {
+    ; if GetKeyState(RWinToRCtrl ? "LAlt" : "Alt", "P") {
     if GetKeyState("Alt", "P") {
         modif := modif "!"
     }
     ; if GetKeyState("LWin", "P") || GetKeyState("RWin", "P") {
-    if GetKeyState("LWin", "P") || !RemapRWinToRCtrl && GetKeyState("RWin", "P") {
+    if GetKeyState("LWin", "P") || !RWinToRCtrl && GetKeyState("RWin", "P") {
         modif := modif "#"
     }
     hkey := modif key
@@ -177,17 +180,25 @@ EnableNaturalScroll := "1"
 strEnableNaturalScroll := "Natural Scroll"
 EnableNaturalScroll := IniRead(IniFile, Section, "EnableNaturalScroll", EnableNaturalScroll)
 
-RemapRWinToRCtrl := "0"
-strRemapRWinToRCtrl := "Remap RWin to RCtrl"
-RemapRWinToRCtrl := IniRead(IniFile, Section, "RemapRWinToRCtrl", RemapRWinToRCtrl)
+JUSLayout := "1"
+strJUSLayout := "JUS Layout"
+JUSLayout := IniRead(IniFile, Section, "JUSLayout", JUSLayout)
 
-UseHHK := "0"
-strUseHHK := "Use HHK"
-UseHHK := IniRead(IniFile, Section, "UseHHK", UseHHK)
+WmacsBind := "1"
+strWmacsBind := "Wmacs Bind"
+WmacsBind := IniRead(IniFile, Section, "WmacsBind", WmacsBind)
 
-Use104On104 := "0"
-strUse104On104 := "Use 104 Keyboard Driver"
-Use104On104 := IniRead(IniFile, Section, "Use104On104", Use104On104)
+RWinToRCtrl := "0"
+strRWinToRCtrl := "RWin to RCtrl"
+RWinToRCtrl := IniRead(IniFile, Section, "RWinToRCtrl", RWinToRCtrl)
+
+AltOneShotToMuHenkan := "0"
+strAltOneShotToMuHenkan := "Alt One Shot to (Mu)Henkan"
+AltOneShotToMuHenkan := IniRead(IniFile, Section, "AltOneShotToMuHenkan", AltOneShotToMuHenkan)
+
+HankakuZenkakuToEsc := "0"
+strHankakuZenkakuToEsc := "Hankaku/Zenkaku to Esc"
+HankakuZenkakuToEsc := IniRead(IniFile, Section, "HankakuZenkakuToEsc", HankakuZenkakuToEsc)
 
 if FileExist(IconFile) {
     TraySetIcon IconFile
@@ -208,20 +219,30 @@ MyMenu.Add strEnableNaturalScroll, menuEnableNaturalScroll
 if EnableNaturalScroll = 1 {
     myMenu.Check strEnableNaturalScroll
 }
+; JUS 配列にするか
+MyMenu.Add strJUSLayout, menuJUSLayout
+if JUSLayout = 1 {
+    myMenu.Check strJUSLayout
+}
+; Wmacs バインドにするか
+MyMenu.Add strWmacsBind, menuWmacsBind
+if WmacsBind = 1 {
+    myMenu.Check strWmacsBind
+}
 ; RWin を RCtrl にリマップするか
-MyMenu.Add strRemapRWinToRCtrl, menuRemapRWinToRCtrl
-if RemapRWinToRCtrl = 1 {
-    myMenu.Check strRemapRWinToRCtrl
+MyMenu.Add strRWinToRCtrl, menuRWinToRCtrl
+if RWinToRCtrl = 1 {
+    myMenu.Check strRWinToRCtrl
+}
+; LAlt/RAlt を Muhenkan/Henkan のワンショットモディファイアにするか
+MyMenu.Add strAltOneShotToMuHenkan, menuAltOneShotToMuHenkan
+if AltOneShotToMuHenkan = 1 {
+    myMenu.Check strAltOneShotToMuHenkan
 }
 ; HHK を使うか
-MyMenu.Add strUseHHK, menuUseHHK
-if UseHHK = 1 {
-    MyMenu.Check strUseHHK
-}
-; US キーボードドライバで US 配列を使うか
-MyMenu.Add strUse104On104, menuUse104On104
-if Use104On104 = 1 {
-    myMenu.Check strUse104On104
+MyMenu.Add strHankakuZenkakuToEsc, menuHankakuZenkakuToEsc
+if HankakuZenkakuToEsc = 1 {
+    MyMenu.Check strHankakuZenkakuToEsc
 }
 
 ; Auto-execute Section の終わり
@@ -259,55 +280,80 @@ menuEnableNaturalScroll(ItemName, ItemPos, MyMenu)
     IniWrite EnableNaturalScroll, IniFile, Section, "EnableNaturalScroll"
 }
 
-menuRemapRWinToRCtrl(ItemName, ItemPos, MyMenu)
+menuJUSLayout(ItemName, ItemPos, MyMenu)
 {
-    global RemapRWinToRCtrl, IniFile, Section, strRemapRWinToRCtrl
-    if RemapRWinToRCtrl = 1 {
-        MyMenu.Uncheck strRemapRWinToRCtrl
-        RemapRWinToRCtrl := 0
+    global JUSLayout, IniFile, Section, strJUSLayout
+    if JUSLayout = 1 {
+        MyMenu.Uncheck strJUSLayout
+        JUSLayout := 0
     } else {
-        MyMenu.Check strRemapRWinToRCtrl
-        RemapRWinToRCtrl := 1
+        MyMenu.Check strJUSLayout
+        JUSLayout := 1
     }
-    IniWrite RemapRWinToRCtrl, IniFile, Section, "RemapRWinToRCtrl"
+    IniWrite JUSLayout, IniFile, Section, "JUSLayout"
 }
 
-menuUseHHK(ItemName, ItemPos, MyMenu)
+menuWmacsBind(ItemName, ItemPos, MyMenu)
 {
-    global UseHHK, IniFile, Section, strUseHHK
-    if UseHHK = 1 {
-        MyMenu.Uncheck strUseHHK
-        UseHHK := 0
+    global WmacsBind, IniFile, Section, strWmacsBind
+    if WmacsBind = 1 {
+        MyMenu.Uncheck strWmacsBind
+        WmacsBind := 0
     } else {
-        MyMenu.Check strUseHHK
-        UseHHK := 1
+        MyMenu.Check strWmacsBind
+        WmacsBind := 1
     }
-    IniWrite(UseHHK, IniFile, Section, "UseHHK")
+    IniWrite WmacsBind, IniFile, Section, "WmacsBind"
 }
 
-menuUse104On104(ItemName, ItemPos, MyMenu)
+menuRWinToRCtrl(ItemName, ItemPos, MyMenu)
 {
-    global Use104On104, IniFile, Section, strUse104On104
-    if Use104On104 = 1 {
-        MyMenu.Uncheck strUse104On104
-        Use104On104 := 0
+    global RWinToRCtrl, IniFile, Section, strRWinToRCtrl
+    if RWinToRCtrl = 1 {
+        MyMenu.Uncheck strRWinToRCtrl
+        RWinToRCtrl := 0
     } else {
-        MyMenu.Check strUse104On104
-        Use104On104 := 1
+        MyMenu.Check strRWinToRCtrl
+        RWinToRCtrl := 1
     }
-    IniWrite Use104On104, IniFile, Section, "Use104On104"
+    IniWrite RWinToRCtrl, IniFile, Section, "RWinToRCtrl"
+}
+
+menuAltOneShotToMuHenkan(ItemName, ItemPos, MyMenu)
+{
+    global AltOneShotToMuHenkan, IniFile, Section, strAltOneShotToMuHenkan
+    if AltOneShotToMuHenkan = 1 {
+        MyMenu.Uncheck strAltOneShotToMuHenkan
+        AltOneShotToMuHenkan := 0
+    } else {
+        MyMenu.Check strAltOneShotToMuHenkan
+        AltOneShotToMuHenkan := 1
+    }
+    IniWrite AltOneShotToMuHenkan, IniFile, Section, "AltOneShotToMuHenkan"
+}
+
+menuHankakuZenkakuToEsc(ItemName, ItemPos, MyMenu)
+{
+    global HankakuZenkakuToEsc, IniFile, Section, strHankakuZenkakuToEsc
+    if HankakuZenkakuToEsc = 1 {
+        MyMenu.Uncheck strHankakuZenkakuToEsc
+        HankakuZenkakuToEsc := 0
+    } else {
+        MyMenu.Check strHankakuZenkakuToEsc
+        HankakuZenkakuToEsc := 1
+    }
+    IniWrite(HankakuZenkakuToEsc, IniFile, Section, "HankakuZenkakuToEsc")
 }
 
 ; --------------------------------------------------------------------
 ; Reload Script
 ; --------------------------------------------------------------------
 
-#HotIf C_q = 0
+#HotIf !C_q
 
 ~RShift & Esc::Reload
 
-; #HotIf C_q = 0 && Use104On104 != 1
-#HotIf C_q = 0 && UseHHK != 1
+#HotIf !C_q && HankakuZenkakuToEsc
 
 ~RShift & vkF3::Reload
 ~RShift & vkF4::Reload
@@ -318,7 +364,7 @@ menuUse104On104(ItemName, ItemPos, MyMenu)
 ; RWin to RCtrl
 ; --------------------------------------------------------------------
 
-#HotIf C_q = 0 && RemapRWinToRCtrl = 1
+#HotIf !C_q && RWinToRCtrl
 
 RWin::RCtrl
 
@@ -328,7 +374,7 @@ RWin::RCtrl
 ; カタカナ ひらがな → 半角/全角
 ; --------------------------------------------------------------------
 
-#HotIf C_q = 0
+#HotIf !C_q && JUSLayout
 
 *vkF2::Send "{Blind}{vkF3}"
 
@@ -336,13 +382,13 @@ RWin::RCtrl
 ; 半角/全角 または `~
 ; --------------------------------------------------------------------
 
-#HotIf !UseHHK && !Use104On104
+#HotIf HankakuZenkakuToEsc && JUSLayout
 
 ; 半角/全角 → ESC
 *vkF3::Send "{Blind}{Esc}"
 *vkF4::Send "{Blind}{Esc}"
 
-#HotIf UseHHK && !Use104On104
+#HotIf !HankakuZenkakuToEsc && JUSLayout
 
 ; 半角/全角 を IME のトグルにしない
 *+vkF3::Send "{Blind}{~}"
@@ -381,7 +427,7 @@ CopyFilePath() {
     A_Clipboard := names
 }
 
-#HotIf C_q = 0 && isTargetExplorer()
+#HotIf !C_q && isTargetExplorer() && WmacsBind
 
 +^c::CopyFileName()
 +^x::CopyFilePath()
@@ -392,7 +438,7 @@ CopyFilePath() {
 ; C-q
 ; --------------------------------------------------------------------
 
-#HotIf C_q = 1
+#HotIf C_q || !WmacsBind
 
 ~*1::
 ~*2::
@@ -535,7 +581,7 @@ CopyFilePath() {
 ; wmacs
 ; --------------------------------------------------------------------
 
-#HotIf C_q = 0 && isWmacsTarget() && Use104On104 != 1
+#HotIf !C_q && isWmacsTarget() && JUSLayout && WmacsBind
 
 *<^vkDE::SendBlind("{F12}")
 *<^vkC0::SendBlind("{PgUp}")
@@ -544,14 +590,13 @@ CopyFilePath() {
 <^vkBB::Send "{Blind}^{Up}"
 <^vkBA::Send "{Blind}^{Down}"
 
-#HotIf C_q = 0 && isWmacsTarget() && Use104On104 = 1
+#HotIf !C_q && isWmacsTarget() && !JUSLayout && WmacsBind
 
- *+vk30::0
 *<^vkBB::SendBlind("{F12}")
 *<^vkDB::SendBlind("{PgUp}")
 *<^vkDD::SendBlind("{PgDn}")
 
-#HotIf C_q = 0 && isWmacsTarget()
+#HotIf !C_q && isWmacsTarget() && WmacsBind
 
 *<^1::SendBlind("{F1}")
 *<^2::SendBlind("{F2}")
@@ -579,16 +624,16 @@ CopyFilePath() {
  <^/::Send "^z"
 +<^/::Send "^y"
 
-#HotIf C_q = 0 && isWmacsTarget()
+#HotIf !C_q && isWmacsTarget() && WmacsBind
 
  *<^vkDC::SendBlind("{Ins}")
 *<^sc07D::SendBlind("{Ins}")
 
-#HotIf C_q = 0 && isWmacsTarget() && Use104On104 != 1
+#HotIf !C_q && isWmacsTarget() && JUSLayout && WmacsBind
 
 *<^vkDD::SendBlind("{Ins}")
 
-#HotIf C_q = 0 && isWmacsTarget() && Use104On104 != 1
+#HotIf !C_q && JUSLayout
 
  +vk32::Send "{@}"
  +vk36::Send "{^}"
@@ -613,7 +658,7 @@ CopyFilePath() {
 ; Misc
 ; --------------------------------------------------------------------
 
-#HotIf C_q = 0
+#HotIf !C_q && JUSLayout
 
 ; disable S-無変換
 +vk1D::return
@@ -628,7 +673,7 @@ vkF0::return
 ; date stamp
 ; --------------------------------------------------------------------
 
-#HotIf C_q = 0 && EnableDateStamp = 1
+#HotIf !C_q && EnableDateStamp && JUSLayout && WmacsBind
 
 +<^vkBB::Send A_YYYY "-" A_MM "-" A_DD
 +<^vkBA::Send FormatTime(, "yyMMdd")
@@ -637,12 +682,29 @@ vkF0::return
 ; natural scroll
 ; --------------------------------------------------------------------
 
-#HotIf EnableNaturalScroll = 1
+#HotIf EnableNaturalScroll
 
 WheelUp::WheelDown
 WheelDown::WheelUp
 WheelLeft::WheelRight
 WheelRight::WheelLeft
+
+#HotIf
+
+; --------------------------------------------------------------------
+; alt one shot to (mu)henkan
+; --------------------------------------------------------------------
+
+; - AHK v2で左右のaltキーをIMEの切り替えに割り当てる #AutoHotkey - Qiita
+; - https://qiita.com/zhiqoo/items/126dae56542f3d451210
+
+#HotIf !C_q && AltOneShotToMuHenkan && JUSLayout
+
+~*LAlt::Send("{Blind}{vk07}")
+~*RAlt::Send("{Blind}{vk07}")
+
+LAlt Up::Send("{vk1D}")
+RAlt Up::Send("{vk1C}")
 
 #HotIf
 
