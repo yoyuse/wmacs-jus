@@ -22,8 +22,9 @@
 
 #Requires AutoHotkey v2.0
 
-WmacsVersion := "2025-04-20"
+WmacsVersion := "2025-04-21"
 
+; 2025-04-21 fix AltOneShotToMuHenkan
 ; 2025-04-20 WmacsBind; comment out: OnClipboardChange ClipChanged
 ; 2025-04-20 RemapRWinToRCtrl → RWinToRCtrl; !Use104On104 → JUSLayout
 ; 2025-04-20 AltOneShotToMuHenkan; !UseHHK → HankakuZenkakuToEsc
@@ -701,14 +702,31 @@ WheelRight::WheelLeft
 
 ; - AHK v2で左右のaltキーをIMEの切り替えに割り当てる #AutoHotkey - Qiita
 ; - https://qiita.com/zhiqoo/items/126dae56542f3d451210
+; - karakaram/alt-ime-ahk
+; - https://github.com/karakaram/alt-ime-ahk
 
 #HotIf !C_q && AltOneShotToMuHenkan && JUSLayout
 
+; メニューがアクティブになるのを抑制
 ~*LAlt::Send("{Blind}{vk07}")
 ~*RAlt::Send("{Blind}{vk07}")
 
-LAlt Up::Send("{vk1D}")
-RAlt Up::Send("{vk1C}")
+; LAlt Up::Send("{vk1D}")
+; RAlt Up::Send("{vk1C}")
+
+LAlt Up:: {
+    ; 単独押しのときのみ無変換キーを送出
+    if A_PriorKey = "LAlt" {
+        Send("{vk1D}")
+    }
+}
+
+RAlt Up::{
+    ; 単独押しのときのみ変換キーを送出
+    if A_PriorKey = "RAlt" {
+        Send("{vk1C}")
+    }
+}
 
 #HotIf
 
