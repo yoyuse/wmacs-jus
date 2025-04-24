@@ -3,13 +3,13 @@
 ; --------------------------------------------------------------------
 ;
 ; ----------------------------------------------------------------------------
-; ¦    ¦F1  ¦F2  ¦F3  ¦F4  ¦F5  ¦F6  ¦F7  ¦F8  ¦F9  ¦F10 ¦F11 ¦F12 ¦Ins ¦    ¦
+; ¦    ¦F1  ¦F2  ¦F3  ¦F4  ¦F5  ¦F6  ¦F7  ¦F8  ¦F9  ¦F10 ¦F11 ¦F12 ¦    ¦    ¦
 ; ¦Esc ¦1 ! ¦2 @ ¦3 # ¦4 $ ¦5 % ¦6 ^ ¦7 & ¦8 * ¦9 ( ¦0 ) ¦- _ ¦= + ¦\ | ¦BS  ¦
 ; ----------------------------------------------------------------------------
 ; ¦      ¦Quot¦    ¦End ¦    ¦    ¦    ¦    ¦    ¦    ¦Up  ¦PgUp¦PgDn¦       ¦
 ; ¦Tab   ¦q Q ¦w W ¦e E ¦r R ¦t T ¦y Y ¦u U ¦i I ¦o O ¦p P ¦[ { ¦] } ¦Enter  ¦
 ; ---------------------------------------------------------------------      ¦
-; ¦       ¦Home¦    ¦Del ¦Rt  ¦    ¦BS  ¦    ¦    ¦    ¦^Up ¦^Dn ¦Ins ¦      ¦
+; ¦       ¦Home¦    ¦Del ¦Rt  ¦    ¦BS  ¦    ¦    ¦    ¦^Up ¦^Dn ¦    ¦      ¦
 ; ¦Eisu   ¦a A ¦s S ¦d D ¦f F ¦g G ¦h H ¦j J ¦k K ¦l L ¦; : ¦' " ¦\ | ¦      ¦
 ; ----------------------------------------------------------------------------
 ; ¦         ¦    ¦    ¦    ¦    ¦Lt  ¦Dn  ¦Ente¦^Hom¦^End¦Undo¦    ¦         ¦
@@ -22,8 +22,9 @@
 
 #Requires AutoHotkey v2.0
 
-WmacsVersion := "2025-04-21"
+WmacsVersion := "2025-04-24"
 
+; 2025-04-24 remove remap Ins
 ; 2025-04-21 fix AltOneShotToMuHenkan
 ; 2025-04-20 WmacsBind; comment out: OnClipboardChange ClipChanged
 ; 2025-04-20 RemapRWinToRCtrl → RWinToRCtrl; !Use104On104 → JUSLayout
@@ -629,6 +630,7 @@ CopyFilePath() {
  <^/::Send "^z"
 +<^/::Send "^y"
 
+/*
 #HotIf !C_q && isWmacsTarget() && WmacsBind
 
  *<^vkDC::SendBlind("{Ins}")
@@ -637,6 +639,7 @@ CopyFilePath() {
 #HotIf !C_q && isWmacsTarget() && JUSLayout && WmacsBind
 
 *<^vkDD::SendBlind("{Ins}")
+*/
 
 #HotIf !C_q && JUSLayout
 
