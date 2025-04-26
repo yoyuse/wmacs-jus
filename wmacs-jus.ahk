@@ -22,8 +22,9 @@
 
 #Requires AutoHotkey v2.0
 
-WmacsVersion := "2025-04-24"
+WmacsVersion := "2025-04-25"
 
+; 2025-04-25 AltOneShotToMuHenkan with timeout
 ; 2025-04-24 remove remap Ins
 ; 2025-04-21 fix AltOneShotToMuHenkan
 ; 2025-04-20 WmacsBind; comment out: OnClipboardChange ClipChanged
@@ -663,21 +664,6 @@ CopyFilePath() {
  *vkE2::Send "{Blind}{``}"
 
 ; --------------------------------------------------------------------
-; Misc
-; --------------------------------------------------------------------
-
-#HotIf !C_q && JUSLayout
-
-; disable S-無変換
-+vk1D::return
-
-; disable W-無変換
-#vk1D::return
-
-; disable 英数
-vkF0::return
-
-; --------------------------------------------------------------------
 ; date stamp
 ; --------------------------------------------------------------------
 
@@ -708,30 +694,24 @@ WheelRight::WheelLeft
 ; - karakaram/alt-ime-ahk
 ; - https://github.com/karakaram/alt-ime-ahk
 
-#HotIf !C_q && AltOneShotToMuHenkan && JUSLayout
-
-; メニューがアクティブになるのを抑制
-~*LAlt::Send("{Blind}{vk07}")
-~*RAlt::Send("{Blind}{vk07}")
-
-; LAlt Up::Send("{vk1D}")
-; RAlt Up::Send("{vk1C}")
-
-LAlt Up:: {
-    ; 単独押しのときのみ無変換キーを送出
-    if A_PriorKey = "LAlt" {
-        Send("{vk1D}")
+singlePress(lastKey, sendKey, timeout := 1000) {
+    ; メニューがアクティブになるのを抑制
+    Send "{Blind}{vkE8}"
+    startTime := A_TickCount
+    KeyWait lastKey, "L"
+    ; KeyWait lastKey
+    elapsedTime := A_TickCount - startTime
+    if timeout < elapsedTime {
+        return
+    }
+    if A_PriorKey = lastKey {
+        Send "{Blind}" sendKey
     }
 }
 
-RAlt Up::{
-    ; 単独押しのときのみ変換キーを送出
-    if A_PriorKey = "RAlt" {
-        Send("{vk1C}")
-    }
-}
-
-#HotIf
+; 左右 Alt で IME OFF/ON
+~*RAlt::singlePress("RAlt", "{vk1C}")
+~*LAlt::singlePress("LAlt", "{vk1D}")
 
 ; --------------------------------------------------------------------
 ; EOF
