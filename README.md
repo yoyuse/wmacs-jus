@@ -14,7 +14,7 @@ Windows/Emacs compromise key bindings for US like layout on JIS keyboard.
 ## JUS 配列
 
 - 記号などの配置が US キーボード風になります
-- `半角/全角` は `Esc` に、 `ひらがな` は `半角/全角` になります
+- `半角/全角` は `` `~ `` に、 `ひらがな` は `半角/全角` になります
 
 ## Wmacs キーバインド
 
