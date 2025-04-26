@@ -22,8 +22,9 @@
 
 #Requires AutoHotkey v2.0
 
-WmacsVersion := "2025-04-25"
+WmacsVersion := "2025-04-26"
 
+; 2025-04-26 OldWmacsBind
 ; 2025-04-25 AltOneShotToMuHenkan with timeout
 ; 2025-04-24 remove remap Ins
 ; 2025-04-21 fix AltOneShotToMuHenkan
@@ -207,6 +208,10 @@ HankakuZenkakuToEsc := "0"
 strHankakuZenkakuToEsc := "Hankaku/Zenkaku to Esc"
 HankakuZenkakuToEsc := IniRead(IniFile, Section, "HankakuZenkakuToEsc", HankakuZenkakuToEsc)
 
+OldWmacsBind := "0"
+strOldWmacsBind := "Old Wmacs Bind"
+OldWmacsBind := IniRead(IniFile, Section, "OldWmacsBind", OldWmacsBind)
+
 if FileExist(IconFile) {
     TraySetIcon IconFile
 }
@@ -246,10 +251,15 @@ MyMenu.Add strAltOneShotToMuHenkan, menuAltOneShotToMuHenkan
 if AltOneShotToMuHenkan = 1 {
     myMenu.Check strAltOneShotToMuHenkan
 }
-; HHK を使うか
+; 半角/全角 を ESC にするか
 MyMenu.Add strHankakuZenkakuToEsc, menuHankakuZenkakuToEsc
 if HankakuZenkakuToEsc = 1 {
     MyMenu.Check strHankakuZenkakuToEsc
+}
+; Old Wmacs バインドにするか
+MyMenu.Add strOldWmacsBind, menuOldWmacsBind
+if OldWmacsBind = 1 {
+    myMenu.Check strOldWmacsBind
 }
 
 ; Auto-execute Section の終わり
@@ -350,6 +360,19 @@ menuHankakuZenkakuToEsc(ItemName, ItemPos, MyMenu)
         HankakuZenkakuToEsc := 1
     }
     IniWrite(HankakuZenkakuToEsc, IniFile, Section, "HankakuZenkakuToEsc")
+}
+
+menuOldWmacsBind(ItemName, ItemPos, MyMenu)
+{
+    global OldWmacsBind, IniFile, Section, strOldWmacsBind
+    if OldWmacsBind = 1 {
+        MyMenu.Uncheck strOldWmacsBind
+        OldWmacsBind := 0
+    } else {
+        MyMenu.Check strOldWmacsBind
+        OldWmacsBind := 1
+    }
+    IniWrite OldWmacsBind, IniFile, Section, "OldWmacsBind"
 }
 
 ; --------------------------------------------------------------------
@@ -594,14 +617,33 @@ CopyFilePath() {
 *<^vkC0::SendBlind("{PgUp}")
 *<^vkDB::SendBlind("{PgDn}")
 
-<^vkBB::Send "{Blind}^{Up}"
-<^vkBA::Send "{Blind}^{Down}"
+#HotIf !C_q && isWmacsTarget() && JUSLayout && WmacsBind && !OldWmacsBind
+
+ <^vkBB::Send "{Blind}^{Up}"
+ <^vkBA::Send "{Blind}^{Down}"
+
+#HotIf !C_q && isWmacsTarget() && JUSLayout && WmacsBind && OldWmacsBind
+
+*<^vkDD::SendBlind("^n")
+ <^vkBB::Send "{Blind}^f"
+ <^vkBA::Send "{Blind}^h"
 
 #HotIf !C_q && isWmacsTarget() && !JUSLayout && WmacsBind
 
 *<^vkBB::SendBlind("{F12}")
 *<^vkDB::SendBlind("{PgUp}")
 *<^vkDD::SendBlind("{PgDn}")
+
+#HotIf !C_q && isWmacsTarget() && !JUSLayout && WmacsBind && !OldWmacsBind
+
+ <^vkBA::Send "{Blind}^{Up}"
+ <^vkDE::Send "{Blind}^{Down}"
+
+#HotIf !C_q && isWmacsTarget() && !JUSLayout && WmacsBind && OldWmacsBind
+
+*<^vkDC::SendBlind("^n")
+ <^vkBA::Send "{Blind}^f"
+ <^vkDE::Send "{Blind}^h"
 
 #HotIf !C_q && isWmacsTarget() && WmacsBind
 
@@ -628,8 +670,15 @@ CopyFilePath() {
 *<^m::SendBlind("{Enter}")
 *<^,::SendBlind("^{Home}")
 *<^.::SendBlind("^{End}")
+
+#HotIf !C_q && isWmacsTarget() && WmacsBind && !OldWmacsBind
+
  <^/::Send "^z"
 +<^/::Send "^y"
+
+#HotIf !C_q && isWmacsTarget() && WmacsBind && OldWmacsBind
+
+ <^/::Send "^a"
 
 /*
 #HotIf !C_q && isWmacsTarget() && WmacsBind
@@ -671,6 +720,11 @@ CopyFilePath() {
 
 +<^vkBB::Send A_YYYY "-" A_MM "-" A_DD
 +<^vkBA::Send FormatTime(, "yyMMdd")
+
+#HotIf !C_q && EnableDateStamp && !JUSLayout && WmacsBind
+
++<^vkBA::Send A_YYYY "-" A_MM "-" A_DD
++<^vkDE::Send FormatTime(, "yyMMdd")
 
 ; --------------------------------------------------------------------
 ; natural scroll
