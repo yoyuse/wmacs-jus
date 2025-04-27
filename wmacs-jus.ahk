@@ -22,8 +22,9 @@
 
 #Requires AutoHotkey v2.0
 
-WmacsVersion := "2025-04-26"
+WmacsVersion := "2025-04-27"
 
+; 2025-04-27 rename: QuotedInsert, CtrlQ
 ; 2025-04-26 OldWmacsBind
 ; 2025-04-25 AltOneShotToMuHenkan with timeout
 ; 2025-04-24 remove remap Ins
@@ -60,17 +61,17 @@ InstallKeybdHook
 ; 変数
 ; --------------------------------------------------------------------
 
-C_q := 0
+CtrlQ := 0
 
-quoted_insert() {
-    global C_q
+QuotedInsert() {
+    global CtrlQ
     s := "C-q"
     if CaretGetPos(&x, &y) {
         ToolTip s, x, y + 20, 2
     } else {
         ToolTip s, , , 2
     }
-    C_q := 1
+    CtrlQ := 1
 }
 
 SendBlind(key) {
@@ -122,17 +123,11 @@ GroupAdd "Explorer", "ahk_class Progman"         ; Desktop (Program Manager)
 ; --------------------------------------------------------------------
 
 isWmacsTarget() {
-    if WinActive("ahk_group NoWmacs") {
-        return 0
-    }
-    return 1
+    return !WinActive("ahk_group NoWmacs")
 }
 
 isTargetExplorer() {
-    if WinActive("ahk_group Explorer") {
-        return 1
-    }
-    return 0
+    return !WinActive("ahk_group Explorer")
 }
 
 ; --------------------------------------------------------------------
@@ -379,11 +374,11 @@ menuOldWmacsBind(ItemName, ItemPos, MyMenu)
 ; Reload Script
 ; --------------------------------------------------------------------
 
-#HotIf !C_q
+#HotIf !CtrlQ
 
 ~RShift & Esc::Reload
 
-#HotIf !C_q && HankakuZenkakuToEsc
+#HotIf !CtrlQ && HankakuZenkakuToEsc
 
 ~RShift & vkF3::Reload
 ~RShift & vkF4::Reload
@@ -394,7 +389,7 @@ menuOldWmacsBind(ItemName, ItemPos, MyMenu)
 ; RWin to RCtrl
 ; --------------------------------------------------------------------
 
-#HotIf !C_q && RWinToRCtrl
+#HotIf !CtrlQ && RWinToRCtrl
 
 RWin::RCtrl
 
@@ -404,7 +399,7 @@ RWin::RCtrl
 ; カタカナ ひらがな → 半角/全角
 ; --------------------------------------------------------------------
 
-#HotIf !C_q && JUSLayout
+#HotIf !CtrlQ && JUSLayout
 
 *vkF2::Send "{Blind}{vkF3}"
 
@@ -457,7 +452,7 @@ CopyFilePath() {
     A_Clipboard := names
 }
 
-#HotIf !C_q && isTargetExplorer() && WmacsBind
+#HotIf !CtrlQ && isTargetExplorer() && WmacsBind
 
 +^c::CopyFileName()
 +^x::CopyFilePath()
@@ -468,7 +463,7 @@ CopyFilePath() {
 ; C-q
 ; --------------------------------------------------------------------
 
-#HotIf C_q || !WmacsBind
+#HotIf CtrlQ || !WmacsBind
 
 ~*1::
 ~*2::
@@ -600,8 +595,8 @@ CopyFilePath() {
 ~*NumpadSub::
 ~*NumpadEnter::
 {
-    Global C_q
-    C_q := 0
+    Global CtrlQ
+    CtrlQ := 0
     ToolTip , , , 2
 }
 
@@ -611,41 +606,41 @@ CopyFilePath() {
 ; wmacs
 ; --------------------------------------------------------------------
 
-#HotIf !C_q && isWmacsTarget() && JUSLayout && WmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && JUSLayout && WmacsBind
 
 *<^vkDE::SendBlind("{F12}")
 *<^vkC0::SendBlind("{PgUp}")
 *<^vkDB::SendBlind("{PgDn}")
 
-#HotIf !C_q && isWmacsTarget() && JUSLayout && WmacsBind && !OldWmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && JUSLayout && WmacsBind && !OldWmacsBind
 
  <^vkBB::Send "{Blind}^{Up}"
  <^vkBA::Send "{Blind}^{Down}"
 
-#HotIf !C_q && isWmacsTarget() && JUSLayout && WmacsBind && OldWmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && JUSLayout && WmacsBind && OldWmacsBind
 
 *<^vkDD::SendBlind("^n")
  <^vkBB::Send "{Blind}^f"
  <^vkBA::Send "{Blind}^h"
 
-#HotIf !C_q && isWmacsTarget() && !JUSLayout && WmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && !JUSLayout && WmacsBind
 
 *<^vkBB::SendBlind("{F12}")
 *<^vkDB::SendBlind("{PgUp}")
 *<^vkDD::SendBlind("{PgDn}")
 
-#HotIf !C_q && isWmacsTarget() && !JUSLayout && WmacsBind && !OldWmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && !JUSLayout && WmacsBind && !OldWmacsBind
 
  <^vkBA::Send "{Blind}^{Up}"
  <^vkDE::Send "{Blind}^{Down}"
 
-#HotIf !C_q && isWmacsTarget() && !JUSLayout && WmacsBind && OldWmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && !JUSLayout && WmacsBind && OldWmacsBind
 
 *<^vkDC::SendBlind("^n")
  <^vkBA::Send "{Blind}^f"
  <^vkDE::Send "{Blind}^h"
 
-#HotIf !C_q && isWmacsTarget() && WmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && WmacsBind
 
 *<^1::SendBlind("{F1}")
 *<^2::SendBlind("{F2}")
@@ -658,7 +653,7 @@ CopyFilePath() {
 *<^9::SendBlind("{F9}")
 *<^0::SendBlind("{F10}")
 *<^-::SendBlind("{F11}")
- <^q::quoted_insert()
+ <^q::QuotedInsert()
 *<^e::SendBlind("{End}")
 *<^p::SendBlind("{Up}")
 *<^a::SendBlind("{Home}")
@@ -671,27 +666,27 @@ CopyFilePath() {
 *<^,::SendBlind("^{Home}")
 *<^.::SendBlind("^{End}")
 
-#HotIf !C_q && isWmacsTarget() && WmacsBind && !OldWmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && WmacsBind && !OldWmacsBind
 
  <^/::Send "^z"
 +<^/::Send "^y"
 
-#HotIf !C_q && isWmacsTarget() && WmacsBind && OldWmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && WmacsBind && OldWmacsBind
 
  <^/::Send "^a"
 
 /*
-#HotIf !C_q && isWmacsTarget() && WmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && WmacsBind
 
  *<^vkDC::SendBlind("{Ins}")
 *<^sc07D::SendBlind("{Ins}")
 
-#HotIf !C_q && isWmacsTarget() && JUSLayout && WmacsBind
+#HotIf !CtrlQ && isWmacsTarget() && JUSLayout && WmacsBind
 
 *<^vkDD::SendBlind("{Ins}")
-*/
+ */
 
-#HotIf !C_q && JUSLayout
+#HotIf !CtrlQ && JUSLayout
 
  +vk32::Send "{@}"
  +vk36::Send "{^}"
@@ -716,12 +711,12 @@ CopyFilePath() {
 ; date stamp
 ; --------------------------------------------------------------------
 
-#HotIf !C_q && EnableDateStamp && JUSLayout && WmacsBind
+#HotIf !CtrlQ && EnableDateStamp && JUSLayout && WmacsBind
 
 +<^vkBB::Send A_YYYY "-" A_MM "-" A_DD
 +<^vkBA::Send FormatTime(, "yyMMdd")
 
-#HotIf !C_q && EnableDateStamp && !JUSLayout && WmacsBind
+#HotIf !CtrlQ && EnableDateStamp && !JUSLayout && WmacsBind
 
 +<^vkBA::Send A_YYYY "-" A_MM "-" A_DD
 +<^vkDE::Send FormatTime(, "yyMMdd")
