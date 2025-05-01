@@ -39,5 +39,4 @@ Windows/Emacs compromise key bindings for US like layout on JIS keyboard.
 
 - [Ctrl2Cap](https://learn.microsoft.com/ja-jp/sysinternals/downloads/ctrl2cap) などで `英数` を `Ctrl` にリマップすると便利です
 - `RCtrl` (Right Ctrl) は Wmacs に影響されません。`RCtrl+f` や `RCtrl+n` は (カーソル移動ではなく) Windows 本来の `Ctrl+f` (検索) や `Ctrl+n` (新規) になります
-- 日付入力: `C-S-;` で `2025-04-12` 形式で、 `C-S-'` で `250412` 形式で日付入力ができます
 - `RShift-Esc` で wmacs-jus.ahk を再読み込みします

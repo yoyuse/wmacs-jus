@@ -4,7 +4,7 @@
 ;
 ; ----------------------------------------------------------------------------
 ; ¦    ¦F1  ¦F2  ¦F3  ¦F4  ¦F5  ¦F6  ¦F7  ¦F8  ¦F9  ¦F10 ¦F11 ¦F12 ¦    ¦    ¦
-; ¦Esc ¦1 ! ¦2 @ ¦3 # ¦4 $ ¦5 % ¦6 ^ ¦7 & ¦8 * ¦9 ( ¦0 ) ¦- _ ¦= + ¦\ | ¦BS  ¦
+; ¦` ~ ¦1 ! ¦2 @ ¦3 # ¦4 $ ¦5 % ¦6 ^ ¦7 & ¦8 * ¦9 ( ¦0 ) ¦- _ ¦= + ¦\ | ¦BS  ¦
 ; ----------------------------------------------------------------------------
 ; ¦      ¦Quot¦    ¦End ¦    ¦    ¦    ¦    ¦    ¦    ¦Up  ¦PgUp¦PgDn¦       ¦
 ; ¦Tab   ¦q Q ¦w W ¦e E ¦r R ¦t T ¦y Y ¦u U ¦i I ¦o O ¦p P ¦[ { ¦] } ¦Enter  ¦
@@ -611,11 +611,11 @@ IconFile := A_Linefile "\..\wmacs-jus.ico"
 strWmacsVersion := "Wmacs JUS " WmacsVersion
 WmacsURL := "https://github.com/yoyuse/wmacs-jus"
 
-EnableDateStamp := "1"
+EnableDateStamp := "0"
 strEnableDateStamp := "Date Stamp"
 EnableDateStamp := IniRead(IniFile, Section, "EnableDateStamp", EnableDateStamp)
 
-EnableNaturalScroll := "1"
+EnableNaturalScroll := "0"
 strEnableNaturalScroll := "Natural Scroll"
 EnableNaturalScroll := IniRead(IniFile, Section, "EnableNaturalScroll", EnableNaturalScroll)
 
