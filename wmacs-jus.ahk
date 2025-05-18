@@ -24,6 +24,7 @@
 
 WmacsVersion := "2025-05-18"
 
+; 2025-05-18 EmulateMiddleClick
 ; 2025-05-18 fix AltOneShotToMuHenkan
 ; 2025-04-27 [ttt] EnableTTT: merge ttt.ahk
 ; 2025-04-27 rename: QuotedInsert, CtrlQ
@@ -636,6 +637,10 @@ AltOneShotToMuHenkan := "0"
 strAltOneShotToMuHenkan := "Alt One Shot to (Mu)Henkan"
 AltOneShotToMuHenkan := IniRead(IniFile, Section, "AltOneShotToMuHenkan", AltOneShotToMuHenkan)
 
+EmulateMiddleClick := "0"
+strEmulateMiddleClick := "Emulate Middle Click"
+EmulateMiddleClick := IniRead(IniFile, Section, "EmulateMiddleClick", EmulateMiddleClick)
+
 HankakuZenkakuToEsc := "0"
 strHankakuZenkakuToEsc := "Hankaku/Zenkaku to Esc"
 HankakuZenkakuToEsc := IniRead(IniFile, Section, "HankakuZenkakuToEsc", HankakuZenkakuToEsc)
@@ -686,6 +691,11 @@ if RWinToRCtrl = 1 {
 MyMenu.Add strAltOneShotToMuHenkan, menuAltOneShotToMuHenkan
 if AltOneShotToMuHenkan = 1 {
     myMenu.Check strAltOneShotToMuHenkan
+}
+; ミドルクリックをエミュレートするか
+MyMenu.Add strEmulateMiddleClick, menuEmulateMiddleClick
+if EmulateMiddleClick = 1 {
+    myMenu.Check strEmulateMiddleClick
 }
 ; 半角/全角 を ESC にするか
 MyMenu.Add strHankakuZenkakuToEsc, menuHankakuZenkakuToEsc
@@ -788,6 +798,19 @@ menuAltOneShotToMuHenkan(ItemName, ItemPos, MyMenu)
         AltOneShotToMuHenkan := 1
     }
     IniWrite AltOneShotToMuHenkan, IniFile, Section, "AltOneShotToMuHenkan"
+}
+
+menuEmulateMiddleClick(ItemName, ItemPos, MyMenu)
+{
+    global EmulateMiddleClick, IniFile, Section, strEmulateMiddleClick
+    if EmulateMiddleClick = 1 {
+        MyMenu.Uncheck strEmulateMiddleClick
+        EmulateMiddleClick := 0
+    } else {
+        MyMenu.Check strEmulateMiddleClick
+        EmulateMiddleClick := 1
+    }
+    IniWrite EmulateMiddleClick, IniFile, Section, "EmulateMiddleClick"
 }
 
 menuHankakuZenkakuToEsc(ItemName, ItemPos, MyMenu)
@@ -1224,6 +1247,16 @@ singlePress(lastKey, sendKey, timeout := 1000) {
 ; 左右 Alt で IME OFF/ON
 ~*RAlt::singlePress("RAlt", "{vk1C}")
 ~*LAlt::singlePress("LAlt", "{vk1D}")
+
+#HotIf
+
+; --------------------------------------------------------------------
+; emulate middle click
+; --------------------------------------------------------------------
+
+#HotIf EmulateMiddleClick
+
+~LButton & RButton::Send "{MButton}"
 
 #HotIf
 
