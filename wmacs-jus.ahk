@@ -22,8 +22,9 @@
 
 #Requires AutoHotkey v2.0
 
-WmacsVersion := "2025-04-27"
+WmacsVersion := "2025-05-18"
 
+; 2025-05-18 fix AltOneShotToMuHenkan
 ; 2025-04-27 [ttt] EnableTTT: merge ttt.ahk
 ; 2025-04-27 rename: QuotedInsert, CtrlQ
 ; 2025-04-26 OldWmacsBind
@@ -1218,9 +1219,13 @@ singlePress(lastKey, sendKey, timeout := 1000) {
     }
 }
 
+#HotIf AltOneShotToMuHenkan
+
 ; 左右 Alt で IME OFF/ON
 ~*RAlt::singlePress("RAlt", "{vk1C}")
 ~*LAlt::singlePress("LAlt", "{vk1D}")
+
+#HotIf
 
 ; --------------------------------------------------------------------
 ; ttt
